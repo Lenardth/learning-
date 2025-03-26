@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-html
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-html
+  template:
+    metadata:
+      labels:
+        app: login-html
+    spec:
+      containers:
+      - name: login-html
+        image: leonardth25/login-html-app:latest
+        ports:
+        - containerPort: 80
+

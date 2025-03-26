@@ -25,18 +25,18 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    def app = docker.image('leonardth25/login-html-app:latest')
-                    app.run('-d -p 8085:80')
+                    sh 'kubectl apply -f k8s/deployment.yaml --validate=false'
+                    sh 'kubectl apply -f k8s/service.yaml --validate=false'
                 }
             }
         }
 
         stage('Done') {
             steps {
-                echo '✅ Jenkins deployed Docker container from GitHub!'
+                echo '✅ Jenkins pulled image and deployed to Kubernetes!'
             }
         }
     }

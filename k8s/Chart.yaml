@@ -1,0 +1,6 @@
+apiVersion: v2
+name: login-html
+description: A Helm chart for deploying login-html-app
+version: 0.1.0
+appVersion: "1.0"
+

@@ -1,42 +1,38 @@
 pipeline {
     agent any
 
+    environment {
+        KUBECONFIG = '/var/lib/jenkins/.kube/config'
+    }
+
     stages {
         stage('Pull Docker Image from Docker Hub') {
             steps {
-                script {
-                    docker.image('leonardth25/login-html-app:latest').pull()
-                }
+                sh 'docker pull leonardth25/login-html-app:latest'
             }
         }
 
         stage('Stop Existing Container on Port 8085') {
             steps {
-                script {
-                    sh '''
-                    CONTAINER_ID=$(docker ps -q --filter "publish=8085")
-                    if [ ! -z "$CONTAINER_ID" ]; then
-                        echo "Stopping container on port 8085: $CONTAINER_ID"
-                        docker stop $CONTAINER_ID
-                        docker rm $CONTAINER_ID
-                    fi
-                    '''
-                }
+                sh '''
+                CONTAINER_ID=$(docker ps -q --filter "publish=8085")
+                if [ ! -z "$CONTAINER_ID" ]; then
+                    docker stop $CONTAINER_ID
+                    docker rm $CONTAINER_ID
+                fi
+                '''
             }
         }
 
-        stage('Deploy to Kubernetes') {
+        stage('Deploy to Kubernetes with Helm') {
             steps {
-                script {
-                    sh 'kubectl apply -f k8s/deployment.yaml --validate=false'
-                    sh 'kubectl apply -f k8s/service.yaml --validate=false'
-                }
+                sh 'helm upgrade --install login-html ./k8s'
             }
         }
 
         stage('Done') {
             steps {
-                echo '✅ Jenkins pulled image and deployed to Kubernetes!'
+                echo '✅ Deployed via Helm from Jenkins!'
             }
         }
     }
